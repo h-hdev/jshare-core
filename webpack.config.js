@@ -25,17 +25,17 @@ module.exports = {
       }]
    },
    plugins: [
-      // new CleanWebpackPlugin(),
+      new CleanWebpackPlugin(),
       new HtmlWebPackPlugin({
          template: "./src/index.html",
          filename: "index.html",
          minify: true
       }),
-      // new MiniCssExtractPlugin({
-      //    filename: devMode ? '[name].css' : '[name].[hash].css',
-      //    chunkFilename: devMode ? '[id].css' : '[id].[hash].css',
-      // }),
-      // new webpack.HotModuleReplacementPlugin(),
+      new MiniCssExtractPlugin({
+         filename: devMode ? '[name].css' : '[name].[hash].css',
+         chunkFilename: devMode ? '[id].css' : '[id].[hash].css',
+      }),
+      new webpack.HotModuleReplacementPlugin(),
       // new webpack.DefinePlugin({
       //    PRODUCTION: !devMode
       // })

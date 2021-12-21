@@ -1,0 +1,308 @@
+
+.CodeMirror {
+   height: 100%;
+   background-color: #fff;
+   font-family: Menlo, Monaco, 'Lucida Sans Typewriter', Consolas, 'Courier New', monospace;
+   font-size: 12px;
+ }
+ 
+ .CodeMirror pre {
+   line-height: 1.5;
+ }
+ 
+ .cm-tab {
+   display: inline-block;
+   text-decoration: inherit;
+   border-left: 1px solid #eee;
+ }
+ 
+ .CodeMirror-selected {
+   background-color: #e8f2ff;
+ }
+ 
+ .CodeMirror-gutters {
+   background: #fff;
+   border-right: none;
+ }
+ 
+ .CodeMirror-activeline-background {
+   background: #fff;
+ }
+ 
+ .CodeMirror-activeline-gutter .CodeMirror-linenumber {
+   color: #66b3ff;
+   //   background-color: #fff !important;
+ }
+ 
+ .CodeMirror-linenumber {
+   color: #ccc;
+ }
+
+ 
+.CodeMirror-cursor  {
+   border-left: 2px solid #555;
+}
+
+.CodeMirror-overlayscroll-horizontal div,
+.CodeMirror-overlayscroll-vertical div {
+  background-color: #ddd;
+  border-radius: 0;
+}
+
+// .cm-trailingspace {
+//   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==);
+//   background-position: bottom left;
+//   background-repeat: repeat-x;
+// }
+
+/*** lint **/
+
+.CodeMirror-gutter-elt {
+  position: absolute;
+  cursor: default;
+  z-index: 4;
+}
+
+.CodeMirror-lint-mark-error {
+  border-bottom: 1px solid #ff4f68;
+}
+
+.CodeMirror-lint-mark-warning {
+  border-bottom: 1px solid #f8a427;
+}
+
+
+
+/* The lint marker gutter */
+
+.CodeMirror-lint-markers {
+  width: 16px;
+}
+
+.CodeMirror-lint-marker-multiple {
+  width: 100%;
+  height: 100%;
+}
+
+.CodeMirror-lint-tooltip {
+  font-family: "Consolas", "Microsoft YaHei";
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border: 1px solid black;
+  padding: 6px 10px;
+  font-size: 12px;
+  overflow: hidden;
+  position: fixed;
+  white-space: pre;
+  white-space: pre-wrap;
+  z-index: 100;
+  max-width: 600px;
+  opacity: 0;
+  line-height: 2;
+  transition: opacity .4s;
+  -moz-transition: opacity .4s;
+  -webkit-transition: opacity .4s;
+  -o-transition: opacity .4s;
+  -ms-transition: opacity .4s;
+}
+
+.CodeMirror-lint-marker-error,
+.CodeMirror-lint-marker-warning {
+  cursor: pointer;
+  display: inline-block;
+  height: 6px;
+  width: 6px;
+  vertical-align: middle;
+  position: relative;
+  border-radius: 20px;
+  position: relative;
+  left: 8px;
+}
+
+.CodeMirror-lint-marker-error {
+  background: #ff4f68;
+}
+
+.CodeMirror-lint-marker-warning {
+  background: #f8a427;
+}
+
+.CodeMirror-lint-message-error,
+.CodeMirror-lint-message-warning {
+  &:before {
+    content: ' ';
+    display: inline-block;
+    height: 6px;
+    width: 6px;
+    margin-right: 6px;
+    vertical-align: middle;
+    top: -1px;
+    position: relative;
+    border-radius: 20px;
+    background: red;
+  }
+}
+
+.CodeMirror-lint-message-warning:before {
+  background: #f8a427;
+}
+
+
+
+/*** lint end ***/
+
+.CodeMirror-activeline-gutter .CodeMirror-linenumber {
+  background-color: #fff;
+}
+
+.CodeMirror-overlayscroll-vertical,
+.CodeMirror-overlayscroll-horizontal {
+  opacity: 0;
+}
+
+.CodeMirror-focused {
+
+  .CodeMirror-overlayscroll-vertical,
+  .CodeMirror-overlayscroll-horizontal {
+    opacity: 1;
+  }
+
+  .CodeMirror-selected {
+    background-color: #e4e1ff;
+  }
+}
+
+
+.cm-s-default .cm-keyword {
+  color: #8e4499;
+  font-weight: bold;
+}
+
+.cm-s-default .cm-atom {
+  color: blue;
+  font-weight: bold;
+}
+
+.cm-s-default .cm-number {
+  // color: #B23838;
+  color: #d93333;
+}
+
+.cm-s-default .cm-def {
+  color: #00f;
+}
+
+.cm-s-default .cm-variable {
+  color: #B23838;
+}
+
+.cm-s-default .cm-variable-2 {
+  // color: #05a;
+  color: #00f;
+}
+
+.cm-s-default .cm-variable-3 {
+  color: #085;
+}
+
+.cm-s-default .cm-property {
+  color: #0464C8;
+}
+
+.cm-s-default .cm-operator {
+  color: black;
+}
+
+.cm-s-default .cm-comment {
+  color: #808080;
+}
+
+.cm-s-default .cm-string {
+  color: #019000;
+}
+
+.cm-s-default .cm-string-2 {
+  color: #f50;
+}
+
+.cm-s-default .cm-meta {
+  color: #555;
+}
+
+.cm-s-default .cm-error {
+  color: #f00;
+}
+
+.cm-s-default .cm-qualifier {
+  color: #555;
+}
+
+.cm-s-default .cm-builtin {
+  color: #30a;
+}
+
+.cm-s-default .cm-bracket {
+  color: #997;
+}
+
+.cm-s-default .cm-tag {
+  color: #170;
+}
+
+.cm-s-default .cm-attribute {
+  color: #00c;
+}
+
+.cm-s-default .cm-header {
+  color: blue;
+}
+
+.cm-s-default .cm-quote {
+  color: #090;
+}
+
+.cm-s-default .cm-hr {
+  color: #999;
+}
+
+.cm-s-default .cm-link {
+  color: #00c;
+}
+
+.cm-negative {
+  color: #d44;
+}
+
+.cm-positive {
+  color: #292;
+}
+
+.cm-header,
+.cm-strong {
+  font-weight: bold;
+}
+
+.cm-em {
+  font-style: italic;
+}
+
+.cm-link {
+  text-decoration: underline;
+}
+
+.cm-invalidchar {
+  color: #f00;
+}
+
+pre.CodeMirror-placeholder {
+  color: #999;
+}
+
+.CodeMirror-scroll {
+  margin-right: -34px;
+}
+
+div.CodeMirror span.CodeMirror-matchingbracket {
+  font-weight: bold;
+  color: red;
+}
