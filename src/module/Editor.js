@@ -107,6 +107,12 @@ class Editor {
 
    }
 
+   /**
+    * 
+    * @public
+    * @param {*} key 
+    * @param {*} value 
+    */
    setOption(key, value) {
       this.options[key] = value;
       if (key === 'fontSize') {
@@ -136,6 +142,12 @@ class Editor {
       });
    }
 
+
+   /**
+    * 
+    * @public
+    * @param {*} data 
+    */
    setValue(data) {
       for (let key in this.panels) {
          let panel = this.panels[key];
@@ -145,6 +157,12 @@ class Editor {
       }
    }
 
+   /**
+    * 
+    * @public
+    * @param {*} autoFormt 
+    * @returns 
+    */
    getValue(autoFormt) {
       let result = {};
       for (let key in this.panels) {

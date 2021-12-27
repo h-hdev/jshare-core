@@ -1,8 +1,7 @@
-import Utils from "./utils";
-import Layout from "./layout";
-import Editor from "./module/Editor";
-import Document from './module/document';
-
+import Utils from "../utils";
+import Layout from "../layout";
+import Editor from "./Editor";
+import Document from './document';
 
 class JShare {
 
@@ -23,6 +22,7 @@ class JShare {
          html: '',
       }, data);
 
+      // js is javascript alice
       if (data.js) {
          this.data.javascript = data.js;
       }
@@ -83,6 +83,8 @@ class JShare {
       };
 
       this.init();
+
+      this.addEvents();
    }
 
    init() {
@@ -120,7 +122,6 @@ class JShare {
       }
 
       this.editors = new Editor(this.panels, this.editorOptions, (event, params) => {
-         console.log(event, params);
          switch (event) {
             case 'run':
                this.run();
@@ -132,6 +133,18 @@ class JShare {
       });
 
       this.run();
+   }
+
+   addEvents() {
+
+      window.onresize = () => {
+         if(this.resizeTimer) {
+            clearTimeout(this.resizeTimer);
+         }
+         this.resizeTimer = setTimeout(() => {
+            this.layout.reflow();
+         }, 200);
+      };
    }
 
    run() {
@@ -166,7 +179,7 @@ class JShare {
    }
 
    setData(data) {
-
+      this.editors.setValue(data);
    }
 
    setOption(key, value) {
