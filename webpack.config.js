@@ -2,10 +2,12 @@ const webpack = require('webpack');
 const path = require('path');
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const MiniCssExtractPlugin = require("mini-css-extract-plugin").default;
 const devMode = process.env.WEBPACK_DEV_SERVER;
 const version = require('./package.json').version;
 
+
+console.log(MiniCssExtractPlugin)
 
 const fileName = `[name].${version}`;
 

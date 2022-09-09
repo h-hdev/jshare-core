@@ -56,7 +56,6 @@ class Layout {
          }
 
          container.on('tab', () => {
-            console.log(state);
             _this.callback('run', true);
          });
       });

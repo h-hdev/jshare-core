@@ -51,7 +51,6 @@ class Editor {
 
          if (!panel.isResult) {
             panel.editor = CodeMirror.fromTextArea(panel.textarea, {
-               lineNumbers: true,
                mode: panel.mode === 'text/javascript' ? {
                   name: 'javascript',
                   json: true
@@ -119,17 +118,18 @@ class Editor {
          this.setFontSize();
       } else {
          let isTabSize = key === 'tabSize';
-         for (let key in this.panels) {
-            if (this.panels[key].editor) {
+         for (let p in this.panels) {
+            if (this.panels[p].editor) {
                if (isTabSize) {
-                  this.panels[key].editor.setOption('tabSize', value)
-                  this.panels[key].editor.setOption('indentUnit', value)
-                  this.panels[key].editor.autoFormatRange(
+                  this.panels[p].editor.setOption('tabSize', value)
+                  this.panels[p].editor.setOption('indentUnit', value)
+                  this.panels[p].editor.autoFormatRange(
                      { line: 0, ch: 0 },
-                     { line: this.panels[key].editor.lineCount() }
+                     { line: this.panels[p].editor.lineCount() }
                   );
                } else {
-                  this.panels[key].editor.setOption(key, value);
+                  console.log(key, value);
+                  this.panels[p].editor.setOption(key, value);
                }
             }
          }
