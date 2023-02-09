@@ -24,8 +24,13 @@ import 'codemirror/keymap/sublime';
 import 'codemirror/addon/comment/comment';
 import 'codemirror/addon/comment/continuecomment';
 
+import emmet from '@emmetio/codemirror-plugin';
+emmet(CodeMirror);
+
 import autoFormatter from '../libs/autoFormatter';
 autoFormatter(CodeMirror);
+
+
 
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/monokai.css';
@@ -50,6 +55,33 @@ class Editor {
          let panel = this.panels[key];
 
          if (!panel.isResult) {
+
+				let extraKeys = {
+					'Ctrl-Enter': function (e) { // 运行操作
+						// _this.run();
+						_this.evenCallback('run');
+						return false;
+					},
+					"Ctrl-Q": function (cm) { // 折叠代码操作
+						cm.foldCode(cm.getCursor());
+					},
+					'F11': function (cm) { // 最大化当前编辑器
+						// _this.fullPage(cm.name);
+						_this.evenCallback('fullpage', cm.name);
+						return false;
+					},
+					'Ctrl-J': 'toMatchingTag',
+					'Ctrl-H': function (cm) { // 格式化代码
+						_this.format(cm);
+					}
+				}
+				
+				if(key === 'html') {
+					extraKeys['Tab'] = 'emmetExpandAbbreviation';
+					extraKeys['Esc'] = 'emmetResetAbbreviation';
+					extraKeys['Enter'] = 'emmetInsertLineBreak';
+				}
+
             panel.editor = CodeMirror.fromTextArea(panel.textarea, {
                mode: panel.mode === 'text/javascript' ? {
                   name: 'javascript',
@@ -73,32 +105,12 @@ class Editor {
                // lint: true,
                gutters: ['CodeMirror-lint-markers', 'CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
                foldGutter: true,
-               extraKeys: {
-                  'Ctrl-Enter': function (e) { // 运行操作
-                     // _this.run();
-                     _this.evenCallback('run');
-                     return false;
-                  },
-                  "Ctrl-Q": function (cm) { // 折叠代码操作
-                     cm.foldCode(cm.getCursor());
-                  },
-                  'F11': function (cm) { // 最大化当前编辑器
-                     // _this.fullPage(cm.name);
-                     _this.evenCallback('fullpage', cm.name);
-                     return false;
-                  },
-                  'Ctrl-J': 'toMatchingTag',
-                  'Ctrl-H': function (cm) { // 格式化代码
-                     _this.format(cm);
-                  }
-               }
+               extraKeys: extraKeys
             });
 
-            // HTML 代码支持 Emmet 特性
-            //  if (name === 'html') {
-            //    emmetCodeMirror(plane.obj);
-            //  }
             panel.editor.name = key;
+
+				this.format(panel.editor)
          }
       }
 
@@ -153,9 +165,12 @@ class Editor {
          let panel = this.panels[key];
          if (panel.editor && data[key] !== undefined) {
             panel.editor.setValue(data[key]);
+				this.format(panel.editor);
          }
       }
    }
+
+
 
    /**
     * 

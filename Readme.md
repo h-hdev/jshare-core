@@ -1,3 +1,3 @@
 # JShare Core 
 
-JShare Core Project
+JShare Core Project$$

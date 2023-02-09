@@ -40,7 +40,7 @@ module.exports = {
          output: {
             path: './dist'
          }
-      }),
+      }), 
       new HtmlWebPackPlugin({
          template: "./src/index.html",
          filename: "index.html",
