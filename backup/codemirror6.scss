@@ -1,0 +1,78 @@
+.cm-editor {
+   height: 100%;
+   background-color: #fff;
+   font-family: Menlo, Monaco, 'Lucida Sans Typewriter', Consolas, 'Courier New', monospace;
+   font-size: 12px;
+}
+
+.ͼ1 .cm-scroller {
+   font-family: Menlo, Monaco, 'Lucida Sans Typewriter', Consolas, 'Courier New', monospace;
+}
+
+.cm-line {
+   line-height: 1.5;
+}
+
+.cm-scroller {
+	overflow:hidden
+}
+
+.ͼ1 .cm-lineNumbers .cm-gutterElement {
+   padding-left: 20px;
+}
+
+
+
+// .cm-scroller ::-webkit-scrollbar-thumb {
+//    background: red;
+//    border-radius: 10px;
+// }
+
+.cm-focused .cm-scroller {
+   overflow: auto;
+}
+
+.cm-scroller::-webkit-scrollbar {
+   background: none;
+	width: 5px;
+	height: 5px;
+}
+
+.cm-scroller::-webkit-scrollbar-track {
+   // box-shadow: none;
+   // border-radius: 0;
+   // background: none;
+   // box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3)
+	background: none
+}
+
+.cm-scroller::-webkit-scrollbar-thumb {
+   background: #ddd;
+   border-radius: 0;
+}
+
+// .cm-scroller::-webkit-scrollbar {
+// 	background: none;
+// }
+
+.ͼ2 .cm-activeLine {
+   background-color: #fff;
+}
+
+.cm-editor.cm-focused {
+   outline: none
+}
+
+.ͼ2 .cm-activeLineGutter {
+   color: #66b3ff;
+   background-color: #fff;
+}
+
+.ͼ2 .cm-gutters {
+   background: #fff;
+   border: none;
+}
+
+.cm-gutterElement {
+   color: #ccc;
+}

@@ -1,6 +1,6 @@
 const Utils = {
 
-   extend: (a, b) => {
+   extend: (a: any, b: any) => {
       if (!a) {
          a = {};
       }
@@ -15,7 +15,7 @@ const Utils = {
       return a;
    },
 
-   dateformat: (timestamp) => {
+   dateformat: (timestamp?: number) => {
       var date = timestamp ? new Date(timestamp) : new Date(),
          year = date.getFullYear(),
          month = date.getMonth() + 1,
