@@ -1,6 +1,6 @@
 import Utils from "../utils";
 import DOM from "../utils/DOM";
-import  { LayoutOption, Layouts } from "./layouts";
+import { LayoutOption, Layouts } from "./layouts";
 import Panel from "./Panel";
 import Gutter, { GutterType } from "./Gutter";
 
@@ -12,6 +12,17 @@ export interface LayoutOptions {
 	layout?: LayoutOption, // 
 	panels?: PanelOptions
 };
+
+
+
+type PanelStyleKeys = 'left' | 'top' | 'width' | 'height' | 'order';
+
+type PanelStyle = {
+	[key in PanelStyleKeys]: number
+};
+
+type PanelStyleProperies = PanelStyleKeys[];
+
 
 class Layout {
 
@@ -43,18 +54,18 @@ class Layout {
 	 * @param {*} resizerOptions 
 	 * @param {*} value 
 	 */
-	panelResize(resizerOptions: any, value: any): boolean {
+	panelResize(resizerOptions: any, value: any): false | number[] {
+
 
 		let key = resizerOptions.key,
 			target,
 			nextTarget,
 			targetValue,
 			nextTargetvalue,
-			limit = 20;//resizerOptions.type === 'v' ? 20 : 10;
+			limit = 20;
 
 		for (let i = 0; i < key.length - 1; i++) {
 			if (!target) {
-
 				if (i === key.length - 2) {
 					nextTarget = this.options.layout[key[i] + 1];
 				}
@@ -66,8 +77,6 @@ class Layout {
 				target = target[key[i]]
 			}
 		}
-		// target[key[key.length - 1]] += value;
-		// nextTarget[key[key.length - 1]] -= value;
 
 		targetValue = target[key[key.length - 1]] + value;
 		nextTargetvalue = nextTarget[key[key.length - 1]] - value;
@@ -83,19 +92,30 @@ class Layout {
 
 		this.render();
 
-		return true;
+		return [target, nextTargetvalue];
 	}
 
 
 	render() {
 
-		let left = 0,
-			width: number,
-			height: number,
-			top: number,
+		let styles: PanelStyle = {
+			left: 0,
+			top: 0,
+			width: 0,
+			height: 0,
+			order: 0
+		},
 			panel: string,
 			panelOrder = 0,
-			isFirstRender = false;
+			isFirstRender = false,
+			isStack = false,
+
+			isRow = this.options.layout[0].isRow,
+			properties: PanelStyleProperies = isRow ?
+				['left', 'top', 'width', 'height'] :
+				['top', 'left', 'height', 'width'];
+
+
 
 		if (!this.resizers) {
 			this.resizers = [];
@@ -108,28 +128,37 @@ class Layout {
 		this.options.layout.forEach((column, i) => {
 
 
-			top = 0;
-			width = column.width;
-			column.rows.forEach((row, j) => {
+			isStack = column.stack;
 
-				if (typeof row === 'object') {
-					panel = row[0];
-					height = row[1];
-				} else {
-					panel = row;
-					height = 100 / column.rows.length;
-				}
+			// if (isRow) {
+			// 	styles.left = 0;
+			// 	styles.height = column.size;
+			// } else {
+			// 	styles.width = column.size;
+			// 	styles.top = 0;
+			// }
+			styles[properties[0]] = 0;
+			styles[properties[3]] = column.size;
 
+
+			column.items.forEach((row, j) => {
+
+				panel = typeof row === 'object' ? row[0] : row;
+
+				// styles[isRow ? 'width' : 'height'] = typeof row === 'object' ? row[1] : 100 / column.items.length;
+				styles[properties[2]] = isStack ? 100 : (typeof row === 'object' ? row[1] : 100 / column.items.length);
+
+				styles.order = panelOrder;
 				this.renderPanel({
 					key: panel,
 					name: this.options.panels[panel].name,
-					styles: {
-						width: width,
-						height: height,
-						left: left,
-						top: top,
-						order: panelOrder
-					}
+					styles: styles,
+					stack: isStack ? {
+						active: j === column.active,
+						group: i,
+						index: j
+					} : undefined,
+
 				}, isFirstRender);
 
 
@@ -137,49 +166,83 @@ class Layout {
 				panelOrder++;
 
 
-				top += height
+				// if (isRow) {
+				// 	styles.left += styles.width;
+				// } else {
+				// 	styles.top += styles.height;
+				// }
+				if (!isStack) {
+					styles[properties[0]] += styles[properties[2]];
+				}
 
-				if (j !== column.rows.length - 1) {
+				if (!isStack && j !== column.items.length - 1) {
+
 					this.renderGutter({
-						type: GutterType.Vertical,
-						position: top,
-						key: [i, 'rows', j, 1],
+						type: isRow ? GutterType.Horizontal : GutterType.Vertical,
+						// position: isRow ? styles.left : styles.top,
+						position: styles[properties[0]],
+						key: [i, 'items', j, 1],
 						styles: {
-							left: left + '%',
-							width: width + '%'
+							[properties[1]]: styles[properties[1]],
+							[properties[3]]: styles[properties[3]]
 						},
+						// styles: isRow ? {
+						// 	top: styles.top + '%',
+						// 	height: styles.height + '%'
+						// } : {
+						// 	left: styles.left + '%',
+						// 	width: styles.width + '%'
+						// }
+
 					}, isFirstRender);
 
 				}
 			});
 
 
-			left += width;
-
+			// if (isRow) {
+			// 	styles.top += styles.height;
+			// } else {
+			// 	styles.left += styles.width;
+			// }
+			styles[properties[1]] += styles[properties[3]];
 
 			if (i !== this.options.layout.length - 1) {
+
 				this.renderGutter({
-					type: GutterType.Horizontal,
-					key: [i, 'width'],
-					position: left,
+					type: isRow ? GutterType.Vertical : GutterType.Horizontal,
+					key: [i, 'size'],
+					// position: isRow ? styles.top : styles.left,
+					position: styles[properties[1]],
 					styles: {}
 				}, isFirstRender);
 			}
 		});
 
 
+		this.root.className = 'layout layout-' + (isRow ? GutterType.Horizontal : GutterType.Vertical)
 
 		// TODO: Stack 模式下 resizer 数据会减少，需要删除多余的
 		//console.log(this.resizerCount, this.resizers.length);
-		// if (this.resizerCount < this.resizers.length) {
-
-		// }
+		let mius = this.resizers.length - this.resizerCount;
+		while (mius > 0) {
+			this.resizers[this.resizers.length - 1] = this.resizers[this.resizers.length - 1].destory();
+			this.resizers.length -= 1;
+			mius--;
+		}
 	}
 
 	renderPanel(panelOptions, isFirstRender) {
 		let panel = panelOptions.key;
 		if (isFirstRender) {
-			this.panels[panel] = new Panel(this.root, panelOptions);
+			this.panels[panel] = new Panel(this.root, panelOptions, (event: string, target: any) => {
+				if (event === 'stackActive') {
+					this.options.layout[target.stack.group].active = target.stack.index;
+				}
+				for (let key in this.panels) {
+					this.panels[key].syncState(event, target);
+				}
+			});
 			this.options.panels[panel].container = this.panels[panel].container;
 		} else {
 			this.panels[panel].setOptions(panelOptions);
@@ -226,7 +289,32 @@ class Layout {
 	 * @param {*} str 
 	 */
 	parse(str: string) {
-		console.log(this.options.layout);
+		let options = [],
+			panelKeyMap = {
+				r: 'result',
+				c: 'css',
+				h: 'html',
+				j: 'javascript'
+			};
+		str.split(';').forEach(r => {
+			let row = {
+				size: 50,
+				items: []
+			};
+			r.split(',').forEach(c => {
+				if (c.length === 1) {
+					row.items.push(panelKeyMap[c])
+				} else {
+					row.items.push([
+						panelKeyMap[c[0]],
+						parseFloat(c.substring(1))
+					]);
+				}
+			});
+			options.push(row);
+		});
+
+		return options;
 	}
 
 	/**
@@ -239,9 +327,9 @@ class Layout {
 			rowCount = 0;
 
 		this.options.layout.forEach((column, i) => {
-			rowCount = column.rows.length - 1;
-			column.rows.forEach((row, j) => {
-				str += (typeof row === 'object' ? row[0][0] + row[1] : row) + (j === rowCount ? '' : ',')
+			rowCount = column.items.length - 1;
+			column.items.forEach((row, j) => {
+				str += (typeof row === 'object' ? row[0][0] + row[1] : row[0]) + (j === rowCount ? '' : ',')
 			});
 			if (i < columnCount) {
 				str += ';';

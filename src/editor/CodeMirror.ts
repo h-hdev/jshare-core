@@ -134,6 +134,12 @@ export default class CodeMirror extends CodeEditor {
 	}
 
 
+	setOption(key: string, value: any): boolean {
+		this.instance.setOption(key, value);
+		return true;
+	}
+
+
 	setValue(value: string) {
 		this.instance.setValue(value);
 		this.format();

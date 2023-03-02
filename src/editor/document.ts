@@ -1,32 +1,42 @@
 import Utils from '../utils/index';
 
 const DocTypes = [
-	'<!DOCTYPE HTML>',
-	'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">',
-	'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">',
-	'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">',
-	'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">',
-	'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
-	'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">',
-	'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
+	['HTML 5', '<!DOCTYPE HTML>'],
+	['HTML 4.0.1 strict', '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">'],
+	['HTML 4.0.1 Transitional', '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">'],
+	['HTML 4.0.1 Frameset', '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">'],
+	['HTML 1.0 Strict', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'],
+	['HTML 1.0 Transitional', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'],
+	['HTML 1.0 Frameset', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">'],
+	['HTML 1.1', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">']
 ];
 
 const Document = {
 
-	setOption: (key, value): boolean => {
+	setOption: (key: string, value: any): boolean => {
 
-		if(key === 'doctype') {
-			if(value >=0 && value <= DocTypes.length -1) {
+		if (key === 'doctype') {
+			if (value >= 0 && value <= DocTypes.length - 1) {
 				return true;
 			}
-		} else if(key === 'meta' || key === 'autoFormt') {
+		} else if (key === 'meta' || key === 'autoFormt') {
 			return true;
 		}
 
 		return false;
 	},
+
+	getDoctypeNames: () : string[] => {
+
+		let result: string[] = [];
+		DocTypes.map(dt => {
+			result.push(dt[0])
+		});
+		return result;
+	},
+
 	getDoctype: (index: number = 0) => {
-		return DocTypes[index];
+		return DocTypes[index][1];
 	},
 
 	getMeta: (meta: string = '') => {
@@ -47,7 +57,7 @@ ${meta}
 		return `${Document.getDoctype(options.doctype)}<html>
 <head>
 <meta charset="utf-8">
-${Document.getMeta()}
+${Document.getMeta(options.meta)}
 <style>
 ${data.css}
 </style>

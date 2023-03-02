@@ -12,13 +12,17 @@ enum EditorTabSize {
 	larg = 4
 }
 
-export enum EditorFontSize {
-	'12px',
-	'14px',
-	'16px'
-};
+// export type EditorFontSize = 
+// 	'12px',
+// 	'14px',
+// 	'16px'
+// };
 
-export type FontSize = '12px' | '14px' | '16px';
+// export type FontSize = '12px' | '14px' | '16px';
+
+// const FontSize = ['12px', '13px', '14px', '16px'];
+
+// export FontSize;
 
 export interface EditorOptions {
 
@@ -29,7 +33,7 @@ export interface EditorOptions {
 	// 自动换行
 	lineWrapping: boolean,
 	// 字体
-	fontSize: EditorFontSize,
+	fontSize: string,
 };
 
 import {EditorData} from '../JShare';
@@ -73,7 +77,6 @@ class Editor {
 		this.options[key] = value;
 		if (key === 'fontSize') {
 			this.setFontSize();
-
 		} else {
 			let isTabSize = key === 'tabSize';
 			for (let p in this.panels) {
@@ -81,10 +84,10 @@ class Editor {
 					if (isTabSize) {
 						this.panels[p].editor.setOption('tabSize', value)
 						this.panels[p].editor.setOption('indentUnit', value)
-						this.panels[p].editor.autoFormatRange(
-							{ line: 0, ch: 0 },
-							{ line: this.panels[p].editor.lineCount() }
-						);
+						// this.panels[p].editor.autoFormatRange(
+						// 	{ line: 0, ch: 0 },
+						// 	{ line: this.panels[p].editor.lineCount() }
+						// );
 					} else {
 						this.panels[p].editor.setOption(key, value);
 					}

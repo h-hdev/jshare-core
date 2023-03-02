@@ -3,10 +3,12 @@ import Layout from "./layout";
 import Editor from "./editor/Editor";
 import Document from './editor/document';
 
-import { EditorOptions, EditorFontSize } from './editor/Editor';
+import { EditorOptions } from './editor/Editor';
 import { CodeEditor } from "./editor/CodeEditor";
 
-import { LayoutNameArr } from "./layout/layouts";
+import { defaultOptions, JShareMetaData } from './JShareOptions';
+
+import Cookie from './libs/cookie';
 
 
 export type PanelKey = 'css' | 'javascript' | 'html' | 'result'
@@ -62,39 +64,17 @@ interface JShareOptions {
 	},
 };
 
+
 class JShare {
 
-	static Layouts = LayoutNameArr;
+	// static config = JShareMetaData;
+
 
 	private el: HTMLElement;
 	private data: HTMLData;
-	private options: JShareOptions = {
-		// HTML 文档模式
-		document: {
-			doctype: 0,
-			// Meta 信息
-			meta: '',
-			// 自动格式化代码
-			autoFormt: true
-		},
-		editor: {
-			// 显示行号
-			lineNumbers: true,
-			// 缩进
-			tabSize: 4,
-			// 自动换行
-			lineWrapping: false,
-			// 字体
-			fontSize: EditorFontSize["14px"]
-		},
-		layout: {
-			// 布局
-			index: 0,
-			// 保存布局信息
-			saveLayout: false,
-		},
 
-	};
+
+	private options: JShareOptions = defaultOptions;
 	private layout: Layout;
 	private editor: Editor | undefined;
 	private panels: PanelOptions = {
@@ -121,6 +101,8 @@ class JShare {
 	};
 	private iframe: string;
 
+	private optionsStoreName: string = 'jshare_options';
+
 	/**
 	 * 
 	 * @param {String | DOM} el 
@@ -146,7 +128,10 @@ class JShare {
 			this.data.javascript = data.js;
 		}
 
+		// restore options from cookie
+		this.restoreOptions();
 
+		// set user's options
 		for (let key in options) {
 			if (this.options[key]) {
 				Utils.extend(this.options[key], options[key]);
@@ -160,8 +145,6 @@ class JShare {
 
 
 		this.iframe = `<iframe id="ifr" sandbox="allow-forms allow-popups allow-scripts allow-same-origin${Utils.isWebkit ? ' allow-modals allow-downloads' : ''}"></iframe>`;
-
-
 
 		// set data
 		(Object.keys(this.panels) as PanelKey[]).forEach((key: PanelKey) => {
@@ -229,73 +212,100 @@ class JShare {
 		this.editor.setValue(data);
 	}
 
-	public getData() : EditorData{
+	public getData(): EditorData {
 		return this.editor.getValue();
 	}
 
 	public setOption(key: string, value: string): boolean {
-		for (let k in this.options) {
-			if (this.options[k][key] !== undefined) {
 
-				let isVerify = false;
+		let keys = key.split('.');
+		if (keys.length !== 2) {
+			return false;
+		}
 
-				switch (k) {
-					case 'document':
-						isVerify = Document.setOption(key, value);
-						if (isVerify) {
-							this.run();
-						}
-						break;
-					case 'layout':
-						isVerify = this.layout.setOption(key, value);
-						break;
-					case 'editor':
-						isVerify = this.editor.setOption(key, value);
-						break;
-				}
+		let isVerify = false;
+
+		switch (keys[0]) {
+			case 'document':
+				isVerify = Document.setOption(keys[1], value);
+				break;
+			case 'layout':
+				isVerify = this.layout.setOption(keys[1], value);
+				break;
+			case 'editor':
+				isVerify = this.editor.setOption(keys[1], value);
+				break;
+		}
 
 
-				if (isVerify) {
-					this.options[k][key] = value;
-				}
-				return isVerify;
+		if (isVerify) {
+			this.options[keys[0]][keys[1]] = value;
+			if (keys[0] !== 'document') {
+				this.storeOptions({
+					[keys[0]]: {
+						[keys[1]]: value
+					}
+				})
+			} else {
+				this.run();
 			}
 		}
 
-		return false;
-
-		// for(let k in this.options) {
-		// 	console.log(k);
-		// }
-		// let keys: string[] = key.split('.');
-
-		// if (keys.length < 2) {
-		// 	return false;
-		// }
+		return isVerify;
+	}
 
 
-		// switch (keys[0]) {
-		// 	case 'document':
-		// 		this.options.document[keys[1]] = value;
-		// 		this.run();
-		// 		break;
-		// 	case 'layout':
-		// 		this.options.layout[keys[1]] = value;
-		// 		this.layout.setOptions(this.options.layout);
-		// 		break;
-		// 	case 'editor':
-		// 		this.options.editor[keys[1]] = value;
-		// 		this.editor.setOption(keys[1], value);
-		// 		break;
-		// }
+	private getStore(): object {
+		let cookieStr: string = Cookie.getCookie(this.optionsStoreName);
+		if (!cookieStr) {
+			return null;
+		}
 
-		return true;
+		try {
+			let cookie: object = JSON.parse(cookieStr);
+			return cookie;
+		} catch (err) {
+
+		}
+		return null;
+	}
+
+	private storeOptions(value: object): void {
+		let cookie = this.getStore() || {};
+		for (let key in value) {
+			if (cookie[key] === undefined) {
+				cookie[key] = value[key];
+			} else {
+				Utils.extend(cookie[key], value[key]);
+			}
+		}
+		Cookie.setCookie(this.optionsStoreName, JSON.stringify(cookie), 365);
+	}
+
+	private restoreOptions() {
+		let cookie = this.getStore();
+		if (cookie) {
+			for (let key in this.options) {
+				if (cookie[key]) {
+					Utils.extend(this.options[key], cookie[key]);
+				}
+			}
+		}
 	}
 
 	public fullPage(name: string) {
 		this.layout.fullPage(name);
 	}
 
+	public getConfig(): any {
+		for (let key in JShareMetaData) {
+			JShareMetaData[key].items.forEach(item => {
+				item.value = this.options[key][item.key]
+			});
+		}
+
+		return JShareMetaData;
+	}
 }
 
 export default JShare;

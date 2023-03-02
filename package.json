@@ -1,6 +1,6 @@
 {
 	"name": "jshare-core",
-	"version": "0.0.2",
+	"version": "0.0.4",
 	"description": "JShare core project",
 	"main": "src/index.js",
 	"scripts": {

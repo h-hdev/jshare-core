@@ -6,9 +6,8 @@ export default {
 		outDir: '../dist',
 		rollupOptions: {
 			output: {
-				entryFileNames: "[name]_"+packageJSON.version+".js",
-				chunkFileNames: "[name]_"+packageJSON.version+".js",
-				assetFileNames: '[name]_'+packageJSON.version+'[extname]'
+				entryFileNames: "jshare_"+packageJSON.version+".js",
+				assetFileNames: 'jshare_'+packageJSON.version+'[extname]'
 			}
 		}
 	}

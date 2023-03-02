@@ -1,5 +1,7 @@
 import Utils from "../utils";
-import DOM from "../utils/DOM";
+import BaseUI from "../utils/BaseUI";
+import DOM, { DOMStyles } from "../utils/DOM";
+
 
 
 /**
@@ -10,6 +12,7 @@ export enum GutterType {
 	'Horizontal' = 'horizontal',
 	'Vertical' = 'vertical'
 };
+
 
 /**
  * Gutter Options
@@ -26,27 +29,32 @@ interface Point {
 	y: number
 }
 
-class Gutter {
+class Gutter extends BaseUI {
 
-	private root: HTMLElement;
+	// private root: HTMLElement;
 	private options: GutterOptions;
 	private callback: Function;
 
-	private el: HTMLElement;
+	// private el: HTMLElement;
 
 	private property: string = '';
 	private isVertical: boolean = false;
 
 	private isDragging: boolean = false;
 
-	constructor(root: HTMLElement, options: GutterOptions, callback: Function) {
-		this.root = root;
+	private styles: DOMStyles = {};
 
-		this.options = Utils.extend({
+	// private events: Function[] = [];
+
+	constructor(root: HTMLElement, options: GutterOptions, callback: Function) {
+		super(root);
+
+		this.options = Utils.simpleMerge({
 			type: GutterType.Horizontal,
 			position: 0,
 			styles: {}
 		}, options);
+
 
 		this.isVertical = this.options.type === GutterType.Vertical;
 
@@ -61,43 +69,61 @@ class Gutter {
 
 		this.setOptions();
 
-
 		let mouseStart: Point;
 
-		DOM.addEvent(this.el, 'mousedown', (e: MouseEvent) => {
-			mouseStart = {
-				x: e.clientX,
-				y: e.clientY
-			};
-			this.onDragStart();
-		});
-
-		DOM.addEvent(document.body, 'mousemove', (e: MouseEvent) => {
-			if (mouseStart) {
-				this.onDragging({
-					x: e.clientX - mouseStart.x,
-					y: e.clientY - mouseStart.y
-				});
-
+		this.events.push(
+			DOM.addEvent(this.el, 'mousedown', (e: MouseEvent) => {
 				mouseStart = {
 					x: e.clientX,
 					y: e.clientY
+				};
+				this.onDragStart();
+			})
+		);
+
+
+		this.events.push(
+			DOM.addEvent(document.body, 'mousemove', (e: MouseEvent) => {
+				if (mouseStart) {
+					this.onDragging({
+						x: e.clientX - mouseStart.x,
+						y: e.clientY - mouseStart.y
+					});
+
+					mouseStart = {
+						x: e.clientX,
+						y: e.clientY
+					}
+
+					this.isDragging = true;
+					return DOM.nodefault(e);
 				}
-
-				this.isDragging = true;
-				return DOM.nodefault(e);
-			}
-			
-		});
+			})
+		);
 
 
-		DOM.addEvent(document.body, 'mouseup', (e: MouseEvent) => {
-			if (mouseStart) {
-				mouseStart = undefined;
-				this.isDragging = false;
-				this.onDroped(e);
-			}
-		});
+		this.events.push(
+			DOM.addEvent(document.body, 'keyup', (e: KeyboardEvent) => {
+				if (mouseStart) {
+					if (e.key === 'Escape') {
+						mouseStart = undefined;
+						this.isDragging = false;
+						this.onDroped();
+					}
+				}
+			})
+		);
+
+
+		this.events.push(
+			DOM.addEvent(document.body, 'mouseup', (e: MouseEvent) => {
+				if (mouseStart) {
+					mouseStart = undefined;
+					this.isDragging = false;
+					this.onDroped();
+				}
+			})
+		);
 	}
 
 	public setOptions(options?: GutterOptions) {
@@ -105,20 +131,19 @@ class Gutter {
 			this.options = Utils.extend(this.options, options);
 		}
 
+
 		this.isVertical = this.options.type === GutterType.Vertical;
 		this.property = this.isVertical ? 'top' : 'left';
 		this.el.className = 'gutter gutter-' + this.options.type.toString() + (this.isDragging ? ' active' : '');
 
-		this.options.styles[this.property] = this.options.position + '%';
+		// this.options.styles[this.property] = this.options.position + '%';
 
-		// reset styles
 		['left', 'top', 'width', 'height'].forEach(key => {
-			if (!this.options.styles[key]) {
-				this.options.styles[key] = null;
-			}
+			this.styles[key] = this.options.styles[key] === undefined ? null : this.options.styles[key] + '%';
 		});
+		this.styles[this.property] = this.options.position + '%'
 
-		DOM.setStyles(this.el, this.options.styles);
+		DOM.setStyles(this.el, this.styles);
 	}
 
 	private onDragStart() {
@@ -141,7 +166,7 @@ class Gutter {
 		this.callback(this.options, change / total * 100);
 	}
 
-	private onDroped(e: MouseEvent) {
+	private onDroped() {
 		this.el.classList.remove('active');
 		document.body.classList.remove(this.isVertical ? 'ns-dragging' : 'ew-dragging');
 	}
